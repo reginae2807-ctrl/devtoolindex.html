@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevToolkit | Utilidades Ligeras 502</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #0f172a; color: #f1f5f9; margin: 0; padding: 15px; }
+        .box { max-width: 660px; margin: auto; background: #1e293b; padding: 20px; border-radius: 8px; border: 1px solid #334155; }
+        h2 { color: #38bdf8; margin-top: 0; text-align: center; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .tabs button { flex: 1; padding: 9px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; background: #334155; color: #cbd5e1; }
+        .tabs button.activa { background: #0284c7; color: #fff; }
+        label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 9px; border-radius: 5px; border: 1px solid #475569; background: #0f172a; color: #fff; box-sizing: border-box; margin-bottom: 12px; font-size: 14px; }
+        .panel { display: none; }
+        .panel.visible { display: block; }
+        .resultado { background: #0f172a; border: 1px solid #38bdf8; padding: 12px; border-radius: 6px; font-weight: bold; text-align: center; color: #7dd3fc; }
+        .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+        .m-card { background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #334155; }
+        .m-card strong { display: block; font-size: 18px; color: #38bdf8; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>🛠️ DevToolkit - Suite Ligera</h2>
+    <div class="tabs">
+        <button id="tabTemp" class="activa" onclick="cambiarTab('temp')">🌡️ Convertidor Temp.</button>
+        <button id="tabTexto" onclick="cambiarTab('texto')">📝 Analizador Texto</button>
+    </div>
+
+    <!-- UTILIDAD 1: TEMPERATURA -->
+    <div id="panel-temp" class="panel visible">
+        <label>Valor numérico:</label>
+        <input type="number" id="valTemp" step="any" placeholder="Ej. 25" oninput="convertirTemp()">
+        <label>Escala de origen:</label>
+        <select id="escalaTemp" onchange="convertirTemp()">
+            <option value="C">Celsius (°C)</option>
+            <option value="F">Fahrenheit (°F)</option>
+            <option value="K">Kelvin (K)</option>
+        </select>
+        <div class="resultado" id="resTemp">Ingresa un valor para convertir</div>
+    </div>
+
+    <!-- UTILIDAD 2: ANALIZADOR DE TEXTO -->
+    <div id="panel-texto" class="panel">
+        <label>Escribe o pega un texto:</label>
+        <textarea id="txtAnalizar" rows="4" placeholder="Escribe aquí para analizar..." oninput="analizarTexto()"></textarea>
+        <div class="metrics">
+            <div class="m-card"><strong id="cntChars">0</strong><small>Caracteres</small></div>
+            <div class="m-card"><strong id="cntWords">0</strong><small>Palabras</small></div>
+            <div class="m-card"><strong id="cntLines">0</strong><small>Líneas</small></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function cambiarTab(nombre) {
+        document.querySelectorAll(".panel").forEach(p => p.classList.remove("visible"));
+        document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("activa"));
+        document.getElementById("panel-" + nombre).classList.add("visible");
+        if (nombre === "temp") document.getElementById("tabTemp").classList.add("activa");
+        if (nombre === "texto") document.getElementById("tabTexto").classList.add("activa");
+    }
+
+    function convertirTemp() {
+        const v = parseFloat(document.getElementById("valTemp").value);
+        const esc = document.getElementById("escalaTemp").value;
+        const out = document.getElementById("resTemp");
+        if (isNaN(v)) { out.innerText = "Ingresa un valor para convertir"; return; }
+
+        let c, f, k;
+        if (esc === "C") { c = v; f = (v * 9/5) + 32; k = v + 273.15; }
+        else if (esc === "F") { c = (v - 32) * 5/9; f = v; k = c + 273.15; }
+        else { k = v; c = v - 273.15; f = (c * 9/5) + 32; }
+
+        out.innerText = `${c.toFixed(2)} °C  |  ${f.toFixed(2)} °F  |  ${k.toFixed(2)} K`;
+    }
+
+    function analizarTexto() {
+        const txt = document.getElementById("txtAnalizar").value;
+        document.getElementById("cntChars").innerText = txt.length;
+        const palabras = txt.trim() === "" ? 0 : txt.trim().split(/\s+/).length;
+        document.getElementById("cntWords").innerText = palabras;
+        const lineas = txt === "" ? 0 : txt.split("\n").length;
+        document.getElementById("cntLines").innerText = lineas;
+    }
+</script>
+</body>
+</html>
